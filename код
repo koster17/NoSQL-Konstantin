@@ -1,0 +1,93 @@
+// ===== Задание 2. База и коллекции =====
+use universityDB
+db.createCollection("students")
+db.createCollection("courses")
+show collections
+
+// ===== Задание 3. Embedded Document (10 документов) =====
+db.students.insertMany([
+  { studentId: 1001, name: "Aibek", age: 19, group: "IS-24-1", gpa: 3.5,
+    contact: { city: "Almaty", email: "aibek@example.com" },
+    skills: ["Python", "Java", "MongoDB"] },
+  { studentId: 1002, name: "Dana", age: 20, group: "IS-24-1", gpa: 3.8,
+    contact: { city: "Almaty", email: "dana@example.com" },
+    skills: ["Python", "SQL"] },
+  { studentId: 1003, name: "Nurlan", age: 21, group: "IS-24-2", gpa: 2.9,
+    contact: { city: "Astana", email: "nurlan@example.com" },
+    skills: ["Java", "MongoDB"] },
+  { studentId: 1004, name: "Aliya", age: 19, group: "IS-24-1", gpa: 3.2,
+    contact: { city: "Almaty", email: "aliya@example.com" },
+    skills: ["C++", "SQL"] },
+  { studentId: 1005, name: "Ruslan", age: 22, group: "IS-24-3", gpa: 3.9,
+    contact: { city: "Shymkent", email: "ruslan@example.com" },
+    skills: ["Python", "MongoDB", "Docker"] },
+  { studentId: 1006, name: "Kamila", age: 20, group: "IS-24-2", gpa: 3.0,
+    contact: { city: "Astana", email: "kamila@example.com" },
+    skills: ["Java"] },
+  { studentId: 1007, name: "Timur", age: 21, group: "IS-24-1", gpa: 2.7,
+    contact: { city: "Almaty", email: "timur@example.com" },
+    skills: ["Python"] },
+  { studentId: 1008, name: "Saule", age: 19, group: "IS-24-3", gpa: 3.6,
+    contact: { city: "Karaganda", email: "saule@example.com" },
+    skills: ["SQL", "MongoDB"] },
+  { studentId: 1009, name: "Erlan", age: 22, group: "IS-24-2", gpa: 3.1,
+    contact: { city: "Almaty", email: "erlan@example.com" },
+    skills: ["Java", "Python"] },
+  { studentId: 1010, name: "Madina", age: 20, group: "IS-24-1", gpa: 3.4,
+    contact: { city: "Astana", email: "madina@example.com" },
+    skills: ["C++", "Java"] }
+])
+
+// Рисунок 2 (все 10 документов)
+db.students.find()
+
+// ===== Задание 4. Массив вложенных документов =====
+db.students.updateOne(
+  { studentId: 1001 },
+  { $set: { grades: [
+    { course: "NoSQL", grade: 90 },
+    { course: "Algorithms", grade: 85 }
+  ]}}
+)
+db.students.findOne({ studentId: 1001 })
+
+// ===== Задание 5. Dot notation =====
+db.students.find({ "contact.city": "Almaty" })
+db.students.find({ "contact.city": "Almaty", gpa: { $gte: 3.0 } })
+db.students.find({ "contact.city": "Astana" })
+
+// ===== Задание 6. Массивы =====
+db.students.find({ skills: "MongoDB" })
+db.students.find({ skills: { $all: ["Java", "MongoDB"] } })
+db.students.updateOne({ studentId: 1001 }, { $push: { skills: "Docker" } })
+db.students.findOne({ studentId: 1001 })
+
+// ===== Задание 7. Referencing =====
+db.courses.insertMany([
+  { _id: 501, name: "NoSQL", credits: 5 },
+  { _id: 502, name: "Algorithms", credits: 5 },
+  { _id: 503, name: "Programming", credits: 6 },
+  { _id: 504, name: "Databases", credits: 4 },
+  { _id: 505, name: "Web Development", credits: 5 }
+])
+db.students.updateOne({ studentId: 1001 }, { $set: { courseIds: [501, 502, 503] } })
+db.students.findOne({ studentId: 1001 })
+
+// ===== Задание 8. Embedding vs Referencing =====
+db.students_embedded_demo.insertOne({
+  studentId: 1001, name: "Aibek",
+  courses: [
+    { name: "NoSQL", credits: 5 },
+    { name: "Algorithms", credits: 5 }
+  ]
+})
+
+// ===== Повышенный уровень. $lookup =====
+db.students.aggregate([
+  { $lookup: {
+    from: "courses",
+    localField: "courseIds",
+    foreignField: "_id",
+    as: "courseInfo"
+  }}
+])
