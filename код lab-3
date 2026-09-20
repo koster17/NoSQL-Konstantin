@@ -1,0 +1,106 @@
+
+use universityDB
+show collections
+
+// ---------- Задание 5. insertOne() ----------
+db.students.insertOne({
+  studentId: 1011, name: "Bekzat", age: 20, group: "IS-24-1",
+  gpa: 3.5, active: true,
+  contact: { city: "Almaty", email: "bekzat@example.com" },
+  skills: ["Java", "MongoDB"]
+})
+
+// ---------- Задание 6. insertMany() ----------
+db.students.insertMany([
+  { studentId: 1012, name: "Alina", age: 19, gpa: 3.8, active: true, skills: ["Python", "MongoDB"] },
+  { studentId: 1013, name: "Damir", age: 21, gpa: 2.9, active: false, skills: ["Java", "Docker"] }
+])
+db.students.countDocuments()
+
+// ---------- Задание 7. find() и findOne() ----------
+db.students.find()
+db.students.findOne({ studentId: 1001 })
+db.students.findOne({ name: "Aibek" })          
+
+// ---------- Задание 8. Фильтрация ----------
+// Равенство
+db.students.find({ group: "IS-24-1" })
+db.students.find({ active: true })
+db.students.find({ gpa: 3.8 })                  
+
+// Операторы сравнения
+db.students.find({ gpa: { $gt: 3.0 } })
+db.students.find({ age: { $gte: 18 } })
+db.students.find({ gpa: { $lt: 3.0 } })         
+db.students.find({ active: { $ne: true } })     
+
+// ---------- Задание 9. Несколько условий ----------
+db.students.find({ group: "IS-24-1", gpa: { $gte: 3.0 } })
+db.students.find({ $or: [ { group: "IS-24-1" }, { group: "IS-24-2" } ] })
+
+// ---------- Задание 10. Dot notation ----------
+db.students.find({ "contact.city": "Almaty" })
+db.students.find({ "contact.email": "aibek@example.com" })
+
+// ---------- Задание 11. Массивы ----------
+db.students.find({ skills: "MongoDB" })
+db.students.find({ skills: { $all: ["Java", "MongoDB"] } })
+
+// ---------- Задание 12. Проекция ----------
+db.students.find({}, { _id: 0, name: 1, gpa: 1 })
+
+// ---------- Задание 13. Сортировка и limit() ----------
+db.students.find().sort({ age: 1 })
+db.students.find().sort({ gpa: -1 }).limit(3)
+
+// ---------- Задание 14. updateOne() ----------
+db.students.updateOne({ studentId: 1001 }, { $set: { gpa: 3.8, active: true } })
+db.students.findOne({ studentId: 1001 })
+
+// ---------- Задание 15. updateMany() ----------
+db.students.updateMany({ group: "IS-24-1" }, { $set: { status: "active" } })
+
+// ---------- Задание 16. $inc ----------
+db.students.updateOne({ studentId: 1001 }, { $inc: { age: 1 } })
+db.students.findOne({ studentId: 1001 })
+
+// ---------- Задание 17. $push ----------
+db.students.updateOne({ studentId: 1002 }, { $push: { skills: "Docker" } })
+db.students.findOne({ studentId: 1002 })
+
+// ---------- Задание 18. deleteOne() ----------
+db.students.findOne({ studentId: 1010 })
+db.students.deleteOne({ studentId: 1010 })
+db.students.findOne({ studentId: 1010 })
+
+// ---------- Задание 19. deleteMany() ----------
+db.students.find({ active: false })
+db.students.deleteMany({ active: false })
+
+// ---------- Задание 20. Итоговая проверка ----------
+db.students.find()
+db.students.countDocuments()
+
+// ---------- Задание 22. Комбинированный запрос ----------
+db.students.find(
+  { "contact.city": "Almaty", gpa: { $gte: 3.0 } },
+  { _id: 0, name: 1, group: 1, gpa: 1 }
+).sort({ gpa: -1 }).limit(3)
+
+// ---------- Задание 23. Итоговый мини-сценарий ----------
+// INSERT
+db.students.insertOne({ studentId: 1020, name: "TestUser", age: 20, gpa: 3.0, active: true })
+
+// FIND — проверяем, что документ создан
+db.students.findOne({ studentId: 1020 })        
+
+// UPDATE — изменяем данные
+db.students.updateOne({ studentId: 1020 }, { $set: { gpa: 3.5 } })   
+
+// FIND — проверяем изменение
+db.students.findOne({ studentId: 1020 })        
+// DELETE — удаляем документ
+db.students.deleteOne({ studentId: 1020 })      
+
+// FIND — убеждаемся, что документ удалён
+db.students.findOne({ studentId: 1020 })        
